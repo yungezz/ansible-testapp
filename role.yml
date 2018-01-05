@@ -43,7 +43,7 @@
           - "{{ http_port }}"
         registry_login_server: "{{ registry_name }}.azurecr.io"
         registry_username: "{{ registry_name }}"
-        registry_password: "{{ acr_result.state.password_value }}"
+        registry_password: "{{ acr_result.credentials.password }}"
         containers:
           - name: "{{ image_name }}"
             ports:
