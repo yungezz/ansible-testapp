@@ -1,0 +1,52 @@
+- name: Create Azure VM
+  hosts: localhost
+  connection: local
+  tasks:
+  - name: Create virtual network
+    azure_rm_virtualnetwork:
+        resource_group: yungez-ansible
+        name: testvm001
+        address_prefixes: "10.10.0.0/16"
+
+  - name: Add subnet
+    azure_rm_subnet:
+        resource_group: yungez-ansible
+        name: testvm001
+        address_prefix: "10.10.0.0/24"
+        virtual_network: testvm001
+
+  - name: Create public ip
+    azure_rm_publicipaddress:
+        resource_group: yungez-ansible
+        allocation_method: Static
+        name: testvm001
+
+  - name: Create security group
+    azure_rm_securitygroup:
+        resource_group: yungez-ansible
+        name: testvm001
+
+  - name: Create NIC
+    azure_rm_networkinterface:
+        resource_group: yungez-ansible
+        name: testvm001
+        virtual_network: testvm001
+        subnet: testvm001
+        public_ip_name: testvm001
+        security_group: testvm001
+
+  - name: Create virtual machine
+    azure_rm_virtualmachine:
+        resource_group: yungez-ansible
+        name: testvm002
+        vm_size: Standard_A0
+        admin_username: adminuser
+        admin_password: Password123!
+        short_hostname: testvm
+        os_type: Linux
+        network_interfaces: testvm001
+        image:
+          offer: UbuntuServer
+          publisher: Canonical
+          sku: 16.04-LTS
+          version: latest
