@@ -3,11 +3,11 @@
   roles:
     - Azure.azure_preview_modules
   vars:
-    resource_group: yungez-ansible
-    registry_name: ansibledemoacr
-    repo_url: "https://github.com/Azure-Samples/aci-helloworld.git"
-    workspace: ~/src/aci-helloworld
-    image_name: aci-helloworld
+    resource_group: yungez-demo
+    registry_name: ansibleroledemo
+    repo_url: "https://github.com/yungez/helloworld.git"
+    workspace: ~/src/helloworld
+    image_name: helloworld
     http_port: 80
     email: test@email.com
   tasks:
