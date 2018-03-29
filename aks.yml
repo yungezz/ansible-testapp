@@ -1,0 +1,28 @@
+---
+- hosts: localhost
+  roles:
+    - azure_preview_modules 
+  vars:
+    resource_group: yungez-demo
+    name: k8syungez
+    location: eastus
+    AZURE_CLIENT_ID: ccb453c0-9d71-48b0-9037-1bdbec87353b    
+    SSH_PUBLIC_KEY: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDWuWiuG6G4j888AeGKJO0n1GDX8j4lH+ERbR0YYglsCrFj3pC61KxBJskQLQtxjWzCg6DEXUsDOoaw66dbTURUNEkhSS4lOd8fLHxvfLPoA+/CTbw01bmOtdUX0bioNhYxfMAX1CXGBhuJBjbqbGv4IpyOYf/qqxkB9mZupALqKkNOEwfdGW7U/HeowS4lD3iMHiOpMUb8YHHoS7RdLVKWUK9IVPy6Z2EqjGXOMXZ4o28MJ40q6kVMWJVRmxijDshqD00R+8fQeMWEFVfrcYcQuKYD8QiWQsxZ+4Jg8E1nvDAJykrdatBhXW6+URGq8mTcC1G6gDm1UAsC18F89VpexdP4MVXeVX6J/+6vV3jDXL1qmC1wj48ZeS5s03fosKiM4ATI83WpWpxc1UfBfJDM//8HVHgWTkb/FoBjKMcxtACP3m04YHrvnWXUXucGF6jTxSmEt6sBqk3ohl0eLTZBzndT85Kos3/EVgwUhhDgChLJd4Bp7cH+xp/4KlwpJVmufrrNF7AbqzwdHjPT3tRVTz5yI3owYJvRR/Zq7rHGimw4MrT46dfGpwXRAztyTVWEP7Ephh/Uadztch6mPXOP/ATzTc/XJpp9x4VBH/fzZG6/AtDV0KC7SgpUIgwJTqUcg5mq3RM9trOxcIois+I5xYrcS1hJGFdowtq5CGu7Zw== yungez@microsoft.com\n"
+  
+  tasks:  
+  - name: Scale the AKS instance agent count from 1 to 2
+    azure_rm_aks:
+     name: "{{ name }}"
+     resource_group: "{{ resource_group }}"
+     location: eastus
+     dns_prefix: k8syungez-yungez-demo-685ba0
+     kubernetes_version: 1.7.9
+     service_principal:
+         client_id: "{{ AZURE_CLIENT_ID }}"
+     linux_profile:
+         admin_username: azureuser
+         ssh_key: "{{ SSH_PUBLIC_KEY }}"
+     agent_pool_profiles:
+         - name: nodepool1
+           count: 2
+           vm_size: Standard_DS1_v2
