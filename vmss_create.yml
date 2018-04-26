@@ -41,7 +41,7 @@
             access: Allow
             priority: 1001
             direction: Inbound
-            source_address_prefix: 52.168.121.240
+            source_address_prefix: "52.168.121.240"
             
           - name: tomcat
             protocol: Tcp
