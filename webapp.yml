@@ -1,0 +1,14 @@
+- hosts: localhost
+  connection: local
+  vars:
+    resource_group: demo-451
+    app_name: testansibleapp1
+    vm_name: testvmss
+    location: eastus
+    app_service_plan: /subscriptions/685ba005-af8d-4b04-8f16-a7bf38b2eb5a/resourceGroups/demo-451/providers/Microsoft.Web/serverFarms/testappserviceplan1
+  tasks:
+    - name: Create a web app
+      azure_rm_webapp:
+        resource_group: "{{ resource_group }}"
+        name: "{{ app_name}}"
+        server_farm_id: "{{ app_service_plan }}"
