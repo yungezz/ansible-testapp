@@ -11,18 +11,18 @@
     linux_plan_name: linux_appplan1
 
   tasks:
-    - name: Create a resource group
-      azure_rm_resourcegroup:
+  - name: Create a resource group
+    azure_rm_resourcegroup:
         name: "{{ resource_group }}"
         location: "{{ location }}"
 
-    - name: Create a resource group
-      azure_rm_resourcegroup:
+  - name: Create a resource group
+    azure_rm_resourcegroup:
         name: "{{ plan_resource_group }}"
         location: "{{ location }}"
       
-    - name: 1 - Create a windows web app with non-exist app service plan
-      azure_rm_webapp:
+  - name: 1 - Create a windows web app with non-exist app service plan
+    azure_rm_webapp:
         resource_group: "{{ resource_group }}"
         name: "{{ win_app_name }}1"
         plan:
@@ -31,8 +31,8 @@
           is_linux: false
           sku: S1
       
-    - name: 2- Create a windows web app with existing app service plan, try to update some root level params
-      azure_rm_webapp:
+  - name: 2- Create a windows web app with existing app service plan, try to update some root level params
+    azure_rm_webapp:
         resource_group: "{{ resource_group }}"
         name: "{{ win_app_name}}2"
         plan:
@@ -44,8 +44,8 @@
     
 
 
-    - name: 3 - create a win web app with java run time specific
-      azure_rm_webapp:
+  - name: 3 - create a win web app with java run time specific
+    azure_rm_webapp:
         resource_group: "{{ resource_group }}"
         name: "{{ win_app_name}}3"
         java_version: "1.8"
@@ -53,14 +53,14 @@
           name: "Tomcat"
           version: "8.0"
     
-    - name: 4- create a win web app with python run time
-      azure_rm_webapp:
+  - name: 4- create a win web app with python run time
+    azure_rm_webapp:
         resource_group: "{{ resource_group }}"
         name: "{{ win_app_name}}4"    
         python_version: "3.4"
     
-    - name: 5 - create a docker web app with some app settings, with docker image
-      azure_rm_webapp:
+  - name: 5 - create a docker web app with some app settings, with docker image
+    azure_rm_webapp:
         resource_group: "{{ resource_group }}"
         name: "{{ win_app_name}}5"      
         plan:
@@ -74,8 +74,8 @@
         container_settings:
           name: "ansible/ansible:ubuntu1404"
 
-    - name: 6 - create a docker web app with private acr registry
-      azure_rm_webapp:
+  - name: 6 - create a docker web app with private acr registry
+    azure_rm_webapp:
         resource_group: "{{ resource_group }}"
         name: "{{ win_app_name}}6"      
         plan:
@@ -89,8 +89,8 @@
           registry_server_user: ansibleroledemo
           registry_server_password: 6Ny2uU+kayXmKpRfo2M5sCcwkoAHCs0F
         
-    - name: 7- create a linux web app with linux_fx_version
-      azure_rm_webapp:
+  - name: 7- create a linux web app with linux_fx_version
+    azure_rm_webapp:
         resource_group: "{{ resource_group }}"
         name: "{{ win_app_name}}7"      
         plan:
@@ -100,8 +100,8 @@
           testkey: "testvalue"
         linux_fx_version: "node|6.0"
 
-    - name: 8 - create a linux web app with linux_fx_version and container_settings
-      azure_rm_webapp:
+  - name: 8 - create a linux web app with linux_fx_version and container_settings
+    azure_rm_webapp:
         resource_group: "{{ resource_group }}"
         name: "{{ win_app_name}}8"      
         plan:
@@ -116,8 +116,8 @@
         container_settings:
           name: "ansible/ansible:ubuntu1404"
     
-    - name: 9 - create a windows app with deployment source github
-      azure_rm_webapp:
+  - name: 9 - create a windows app with deployment source github
+    azure_rm_webapp:
         resource_group: "{{ resource_group }}"
         name: "{{ win_app_name}}9"
         net_framework_version: "v4.7"
