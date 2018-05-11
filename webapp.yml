@@ -9,17 +9,21 @@
     plan_resource_group: ansiblewebapp1_plan
     win_plan_name: win_appplan1
     linux_plan_name: linux_appplan1
+    linux_plan_resource_group: appserviceplan_test
+  
+  roles:
+    - azure_preview_modules
 
   tasks:
-  - name: Create a resource group
-    azure_rm_resourcegroup:
-        name: "{{ resource_group }}"
-        location: "{{ location }}"
+  # - name: Create a resource group
+  #   azure_rm_resourcegroup:
+  #       name: "{{ resource_group }}"
+  #       location: "{{ location }}"
 
-  - name: Create a resource group
-    azure_rm_resourcegroup:
-        name: "{{ plan_resource_group }}"
-        location: "{{ location }}"
+  # - name: Create a resource group
+  #   azure_rm_resourcegroup:
+  #       name: "{{ plan_resource_group }}"
+  #       location: "{{ location }}"
       
   - name: 1 - Create a windows web app with non-exist app service plan
     azure_rm_webapp:
@@ -40,7 +44,7 @@
           name: "{{ win_plan_name }}"
         force_dns_registration: false
         skip_dns_registration: true
-        https_only: false
+        https_only: true
     
 
 
@@ -52,25 +56,33 @@
         java_container_settings:
           name: "Tomcat"
           version: "8.0"
-    
+        plan:
+          resource_group: "{{ plan_resource_group }}"
+          name: "{{ win_plan_name }}"
+
   - name: 4- create a win web app with python run time
     azure_rm_webapp:
         resource_group: "{{ resource_group }}"
         name: "{{ win_app_name}}4"    
-        python_version: "3.4"
-    
+        python_version: "2.7"
+        plan:
+          resource_group: "{{ plan_resource_group }}"
+          name: "{{ win_plan_name }}"
+
+
   - name: 5 - create a docker web app with some app settings, with docker image
     azure_rm_webapp:
         resource_group: "{{ resource_group }}"
         name: "{{ win_app_name}}5"      
         plan:
-          resource_group: "{{ plan_resource_group }}"
+          resource_group: appserviceplan_test
           name: "{{ linux_plan_name }}"
           is_linux: true
           sku: S1
-          number_of_workers: 1
+          number_of_workers: 2
         app_settings:
           testkey: "testvalue"
+          testkey2: "testvalue2"
         container_settings:
           name: "ansible/ansible:ubuntu1404"
 
@@ -79,22 +91,25 @@
         resource_group: "{{ resource_group }}"
         name: "{{ win_app_name}}6"      
         plan:
-          resource_group: "{{ plan_resource_group }}"
+          resource_group: appserviceplan_test  #"{{ plan_resource_group }}"
           name: "{{ linux_plan_name }}"
+          is_linux: true
+          sku: S1
+          number_of_workers: 2
         app_settings:
           testkey: "testvalue"
         container_settings:
-          name: "ansible/ansible:ubuntu1404"
+          name: "ansible:ubuntu1404"
           registry_server_url: ansibleroledemo.azurecr.io
           registry_server_user: ansibleroledemo
-          registry_server_password: 6Ny2uU+kayXmKpRfo2M5sCcwkoAHCs0F
+          registry_server_password: 6Ny2uU+kayXmKpRfo2M5sC
         
   - name: 7- create a linux web app with linux_fx_version
     azure_rm_webapp:
         resource_group: "{{ resource_group }}"
         name: "{{ win_app_name}}7"      
         plan:
-          resource_group: "{{ plan_resource_group }}"
+          resource_group: "{{ linux_plan_resource_group }}"
           name: "{{ linux_plan_name }}"
         app_settings:
           testkey: "testvalue"
@@ -105,7 +120,7 @@
         resource_group: "{{ resource_group }}"
         name: "{{ win_app_name}}8"      
         plan:
-          resource_group: "{{ plan_resource_group }}"
+          resource_group: "{{ linux_plan_resource_group }}"
           name: "{{ linux_plan_name }}"
           is_linux: true
           sku: S1
@@ -124,4 +139,8 @@
         deployment_source:
           url: "https://github.com/yungezz/ansible-testapp"
           branch: master
+        scm_type: GitHub
+        plan:
+          resource_group: "{{ plan_resource_group }}"
+          name: "{{ win_plan_name }}"
     
