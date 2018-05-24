@@ -15,15 +15,15 @@
     - azure_preview_modules
 
   tasks:
-  # - name: Create a resource group
-  #   azure_rm_resourcegroup:
-  #       name: "{{ resource_group }}"
-  #       location: "{{ location }}"
+  - name: Create a resource group
+    azure_rm_resourcegroup:
+        name: "{{ resource_group }}"
+        location: "{{ location }}"
 
-  # - name: Create a resource group
-  #   azure_rm_resourcegroup:
-  #       name: "{{ plan_resource_group }}"
-  #       location: "{{ location }}"
+  - name: Create a resource group
+    azure_rm_resourcegroup:
+        name: "{{ plan_resource_group }}"
+        location: "{{ location }}"
       
   - name: 1 - Create a windows web app with non-exist app service plan
     azure_rm_webapp:
@@ -34,55 +34,54 @@
           name: "{{ win_plan_name }}"
           is_linux: false
           sku: S1
-      
+    register: results
+
   - name: 2- Create a windows web app with existing app service plan, try to update some root level params
     azure_rm_webapp:
         resource_group: "{{ resource_group }}"
         name: "{{ win_app_name}}2"
-        plan:
-          resource_group: "{{ plan_resource_group }}"
-          name: "{{ win_plan_name }}"
-        force_dns_registration: false
-        skip_dns_registration: true
+        plan: "{{ win_plan_name }}"
         https_only: true
-    
+    register: results
 
 
   - name: 3 - create a win web app with java run time specific
     azure_rm_webapp:
         resource_group: "{{ resource_group }}"
         name: "{{ win_app_name}}3"
-        java_version: "1.8"
+        windows_framework:
+          java_version: "1.8"
         java_container_settings:
           name: "Tomcat"
           version: "8.0"
         plan:
           resource_group: "{{ plan_resource_group }}"
           name: "{{ win_plan_name }}"
+    register: results
 
-  - name: 4- create a win web app with python run time
+  - name: 4- create a win web app with python run time and java version
     azure_rm_webapp:
         resource_group: "{{ resource_group }}"
         name: "{{ win_app_name}}4"    
-        python_version: "2.7"
+        windows_framework:
+          python_version: "2.7"
+          java_version: "1.8"
         plan:
           resource_group: "{{ plan_resource_group }}"
           name: "{{ win_plan_name }}"
-
+    register: results
 
   - name: 5 - create a docker web app with some app settings, with docker image
     azure_rm_webapp:
         resource_group: "{{ resource_group }}"
         name: "{{ win_app_name}}5"      
         plan:
-          resource_group: appserviceplan_test
+          resource_group: "{{ linux_plan_resource_group }}"
           name: "{{ linux_plan_name }}"
           is_linux: true
           sku: S1
           number_of_workers: 2
-        app_settings:
-          testkey: "testvalue"
-          testkey2: "testvalue2"
+        purge_app_settings: true
         container_settings:
           name: "ansible/ansible:ubuntu1404"
 
@@ -91,7 +90,7 @@
         resource_group: "{{ resource_group }}"
         name: "{{ win_app_name}}6"      
         plan:
-          resource_group: appserviceplan_test  #"{{ plan_resource_group }}"
+          resource_group: "{{ linux_plan_resource_group }}"
           name: "{{ linux_plan_name }}"
           is_linux: true
           sku: S1
@@ -104,7 +103,7 @@
           registry_server_user: ansibleroledemo
           registry_server_password: 6Ny2uU+kayXmKpRfo2M5sC
         
-  - name: 7- create a linux web app with linux_fx_version
+  - name: 7- create a linux web app with linux_framework
     azure_rm_webapp:
         resource_group: "{{ resource_group }}"
         name: "{{ win_app_name}}7"      
@@ -113,7 +112,9 @@
           name: "{{ linux_plan_name }}"
         app_settings:
           testkey: "testvalue"
-        linux_fx_version: "node|6.0"
+        linux_framework:
+          name: node
+          version: "6.6"
 
   - name: 8 - create a linux web app with linux_fx_version and container_settings
     azure_rm_webapp:
@@ -127,7 +128,9 @@
           number_of_workers: 1
         app_settings:
           testkey: "testvalue"
-        linux_fx_version: "node|6.0"
+        linux_framework:
+          name: node
+          version: "6.6"
         container_settings:
           name: "ansible/ansible:ubuntu1404"
     
