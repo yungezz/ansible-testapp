@@ -1,7 +1,7 @@
 - hosts: localhost
   connection: local
   vars:
-    resource_group: ansiblewebapp2
+    resource_group: ansiblewebapp1
     location: eastus   
     vault_name: testvaultaaaaaa 
   
@@ -10,11 +10,15 @@
     set_fact:
       azure_client_id: ea052153-32d8-43ee-a5e0-b423d4703d98
       azure_secret: a89a7ceb-a731-423f-97e5-285716c85176
+      azure_tenant: 72f988bf-86f1-41af-91ab-2d7cd011db47
     
 
   - name: lookup service principal object id
     set_fact:
-      object_id: "{{ lookup('azure_service_principal_attribute', azure_client_id='ea052153-32d8-43ee-a5e0-b423d4703d98', azure_secret='a89a7ceb-a731-423f-97e5-285716c85176', azure_tenant='72f988bf-86f1-41af-91ab-2d7cd011db47') }}"
+      object_id: "{{ lookup('azure_service_principal_attribute', 
+                     azure_client_id=azure_client_id, 
+                     azure_secret=azure_secret,                    
+                     azure_tenant=azure_tenant) }}"
       register: object_id
   
   - name: dump object_id
@@ -38,7 +42,7 @@
         family: A
       access_policies:
         - tenant_id: "{{ tenant_id }}"
-          object_id: ea052153-32d8-43ee-a5e0-b423d4703d98
+          object_id: '{{ object_id }}'
           keys:
             - get
             - list
