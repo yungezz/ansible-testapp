@@ -6,6 +6,20 @@
     vault_name: testvaultaaaaaa 
   
   tasks:
+  - name: set azure credential
+    set_fact:
+      azure_client_id: ea052153-32d8-43ee-a5e0-b423d4703d98
+      azure_secret: a89a7ceb-a731-423f-97e5-285716c85176
+    
+
+  - name: lookup service principal object id
+    set_fact:
+      object_id: "{{ lookup('azure_service_principal_attribute', azure_client_id='ea052153-32d8-43ee-a5e0-b423d4703d98', azure_secret='a89a7ceb-a731-423f-97e5-285716c85176', azure_tenant='72f988bf-86f1-41af-91ab-2d7cd011db47') }}"
+      register: object_id
+  
+  - name: dump object_id
+    debug:
+      var: object_id
 
   - name: Prepare random number
     set_fact:
