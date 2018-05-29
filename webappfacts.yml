@@ -1,0 +1,59 @@
+- hosts: localhost
+  connection: local
+  vars:
+    resource_group: ansiblewebapp1
+    win_app_name: ansiblewindows
+    linux_app_name: ansiblelinux
+    vm_name: testvmss
+    location: eastus
+    plan_resource_group: ansiblewebapp1_plan
+    win_plan_name: win_appplan1
+    linux_plan_name: linux_appplan1
+    linux_plan_resource_group: appserviceplan_test
+
+  roles:
+    - azure_preview_modules
+
+  tasks:
+  - name: list by resource group
+    azure_rm_webapp_facts:
+      resource_group: "{{ resource_group }}"
+
+  - name: list by resource group and tags
+    azure_rm_webapp_facts:
+      resource_group: "{{ resource_group }}"
+      tags:
+        - tag1
+
+  - name: list by resource group and tags values
+    azure_rm_webapp_facts:
+      resource_group: "{{ resource_group }}"
+      tags:
+        tag1: "test"
+
+  - name: list by name
+    azure_rm_webapp_facts:
+      resource_group: "{{ resource_group }}"
+      name: "{{ win_app_name }}1"
+
+  - name: list by name and tag
+    azure_rm_webapp_facts:
+      resource_group: "{{ resource_group }}"
+      name: "{{ win_app_name }}1"
+      tags:
+        - tag1      
+
+  - name: list by name and tag key:value
+    azure_rm_webapp_facts:
+      resource_group: "{{ resource_group }}"
+      name: "{{ win_app_name }}1"
+      tags:
+        tag1: "test"
+
+  - name: list by name and level
+    azure_rm_webapp_facts:
+      resource_group: "{{ resource_group }}"
+      name: "{{ win_app_name }}1"
+      info_level:
+        - level: "app_settings"
+        - level: "configuration"
