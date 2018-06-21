@@ -1,0 +1,9 @@
+---
+- name: Create Azure VM
+  hosts: localhost
+  connection: local
+  vars:
+    resource_group: demo-451
+    vm_name: testvm
+    location: eastus
+  tasks:
