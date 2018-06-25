@@ -1,9 +1,6 @@
 import os
-import re
 import types
 import copy
-import inspect
-import traceback
 import random
 import string
 import time
@@ -18,38 +15,39 @@ class PerfRunner(object):
         self._args = self._parse_cli_args()
 
         # get commands
-        commands = self._get_commands()
+        commands = self._get_azcli_commands(self._args.resource_group, 'UbuntuLTS', 'Standard_DS1_v2')
 
-        # prepare resource group, sub-resources,
-        # for vm, vnet with one subnet
-        print('preparation work.')
-        if 'vm' in self._args['resources'] or self._args['resources'] == 'all':
-            print('create vnet.')
-            call("az network vnet  create -g {0} -n ansiblevnet --adress-prefix 10.0.0.0/16 --subnet-name ansiblesubnet --subnet-prefix 10.0.0.24".format(self._args['resource_group']))
-            call("az network vnet  create -g {0} -n azclivnet --adress-prefix 10.0.0.0/16 --subnet-name azclisubnet --subnet-prefix 10.0.0.24".format(self._args['resource_group']))
+        # # prepare resource group, sub-resources,
+        # # for vm, vnet with one subnet
+        # print('preparation work.')
+        # if 'vm' in self._args['resources'] or self._args['resources'] == 'all':
+        #     print('create vnet.')
+        #     call("az network vnet  create -g {0} -n ansiblevnet --adress-prefix 10.0.0.0/16 --subnet-name ansiblesubnet --subnet-prefix 10.0.0.24".format(self._args['resource_group']))
+        #     call("az network vnet  create -g {0} -n azclivnet --adress-prefix 10.0.0.0/16 --subnet-name azclisubnet --subnet-prefix 10.0.0.24".format(self._args['resource_group']))
 
         # results
         results = dict()
+
         # in loop
         index = 0
         while index < self._args.count:
-            for command in commands:
+            for command in commands.keys():
                 print('start to run test ' + command)
                 # measure time start
                 start = time.time()
 
                 # run command
-                return_code = call(command)
+                return_code = call(command[command])
 
                 if return_code != 0:
                     exit(1)
 
                 # measure time end
                 end = time.time()
-
                 latency = end - start
 
                 results[command] = latency
+                print(command + "======================================" + latency)
         
         print('test done!')
 
@@ -57,44 +55,33 @@ class PerfRunner(object):
         parser = argparse.ArgumentParser(
                     description='Produce an Ansible Inventory file for an Azure subscription')
 
-        parser.add_argument('--tool', action='store', default='all',
-                            help='tools to be tested: (all, azcli, ansible)')
-        parser.add_argument('--operations', action='store', default='all',
-                            help='operations to be tested: (create, update, delete)')
-        parser.add_argument('--resources', action='store', default='all',
-                            help='resources to be tested: (vm, storageaccount)')
+        # parser.add_argument('--tool', action='store', default='all',
+        #                     help='tools to be tested: (all, azcli, ansible)')
+        # parser.add_argument('--resources', action='store', default='all',
+        #                     help='resources to be tested: (vm, storageaccount)')
         parser.add_argument('--count', action='store', default=2,
                             help='test repeat times')
         parser.add_argument('--resource_group', action='store', default='ansibleperftest',
                             help='resource group name')
+        parser.add_argument('--output', action='store', default='.\testresult.txt',
+                            help='output file name')
         return parser.parse_args()
 
-    def _get_commands(self, tools, operations, resources, resourcegroup):
-        result = []
-        variations = dict()
+    def _get_azcli_commands(self, resourcegroup, imagename, size):
+        result = dict()
+        random = ''.join(random.choice(string.ascii_lowercase) for i in range(5))
 
-        for t in tools:
-            for o in operations:
-                random = random.choice(string.ascii_lowercase)
-                for r in resources:
-                    variations[[t, r, o].join('_')] = random
+        vm_name = 'vm' + random
 
-        for v in variations.keys():
-            if v == 'azcli_vm_create':
-                # preparation, create vnet
-                cmd = "az vm create -g {0} -n vm{1} -size Standard_DS1_v2 --vnet-name azclivnet --image UbuntuLTS".format(resourcegroup, variations[v])
-            if v == 'azcli_vm_update':
-                cmd = "az vm update -g {0} -n vm{1} --set tags.tagName=test".format(resourcegroup, variations[v])
-            if v == "azcli_vm_delete":
-                cmd = "az vm delete -g {0} -n vm{1}".format(resourcegroup, variations[v])
-            if v == "ansible_vm_create":
-                cmd = "ansible-playbook .\playbooks\vm_create.yml --extra-vars resource_group={0} name={1}".format(resourcegroup, 'vm' + variations[v])
-            if v == "ansible_vm_create":
-                cmd = "ansible-playbook .\playbooks\vm_create.yml --extra-vars resource_group={0} name={1}".format(resourcegroup, 'vm' + variations[v])
-            if v == "ansible_vm_update":
-                cmd = "ansible-playbook .\playbooks\vm_update.yml --extra-vars resource_group={0} name={1}".format(resourcegroup, 'vm' + variations[v])
-            if v == "ansible_vm_delete":
-                cmd = "ansible-playbook .\playbooks\vm_delete.yml --extra-vars resource_group={0} name={1}".format(resourcegroup, 'vm' + variations[v])
+        result['create_resourcegroup'] = "az group create -n {0} -l eastus".format(resourcegroup)
+        result['create_vnet'] = "az network vnet create -g {0} -n {1}".format(resourcegroup, vm_name)
+        result['create_subnet'] = "az network vnet subnet create -g {0} -n {1}".format(resourcegroup, vm_name)
+        result['create_vm'] = "az vm create -g {0} -n {1} -size Standard_DS1_v2 --vnet-name {2} --image UbuntuLTS".format(resourcegroup, vm_name, vm_name)
+        result['update_vm'] = "az vm update -g {0} -n {1} --set tags.testTag=xxxx".format(resourcegroup, vm_name)
+        result['delete_vm'] = "az vm delete -g {0} -n {1} -y".format(resourcegroup, vm_name)
+
+        return results
+
 
 def main():
     PerfRunner()
