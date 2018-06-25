@@ -1,3 +1,4 @@
+import argparse
 import os
 import types
 import copy
@@ -9,7 +10,7 @@ from subprocess import call
 from os.path import expanduser
 
 class PerfRunner(object):
-    def __int__(self):
+    def __init__(self):
 
         # parse args
         self._args = self._parse_cli_args()
@@ -31,23 +32,22 @@ class PerfRunner(object):
         # in loop
         index = 0
         while index < self._args.count:
-            for command in commands.keys():
-                print('start to run test ' + command)
-                # measure time start
-                start = time.time()
+            index = index + 1
+            for item in commands:
+                for command in item:
+                    print('start to run test ' + command)
+                    # measure time start
+                    start = time.time()
 
-                # run command
-                return_code = call(command[command])
+                    # run command
+                    return_code = subprocess.check_all(item[command], shell=True)
 
-                if return_code != 0:
-                    exit(1)
+                    # measure time end
+                    end = time.time()
+                    latency = end - start
 
-                # measure time end
-                end = time.time()
-                latency = end - start
-
-                results[command] = latency
-                print(command + "======================================" + latency)
+                    results[command] = latency
+                    print(command + "======================================" + latency)
         
         print('test done!')
 
@@ -68,19 +68,19 @@ class PerfRunner(object):
         return parser.parse_args()
 
     def _get_azcli_commands(self, resourcegroup, imagename, size):
-        result = dict()
-        random = ''.join(random.choice(string.ascii_lowercase) for i in range(5))
+        result = []
+        seed = ''.join(random.choice(string.ascii_lowercase) for i in range(5))
 
-        vm_name = 'vm' + random
+        vm_name = 'vm' + seed
 
-        result['create_resourcegroup'] = "az group create -n {0} -l eastus".format(resourcegroup)
-        result['create_vnet'] = "az network vnet create -g {0} -n {1}".format(resourcegroup, vm_name)
-        result['create_subnet'] = "az network vnet subnet create -g {0} -n {1}".format(resourcegroup, vm_name)
-        result['create_vm'] = "az vm create -g {0} -n {1} -size Standard_DS1_v2 --vnet-name {2} --image UbuntuLTS".format(resourcegroup, vm_name, vm_name)
-        result['update_vm'] = "az vm update -g {0} -n {1} --set tags.testTag=xxxx".format(resourcegroup, vm_name)
-        result['delete_vm'] = "az vm delete -g {0} -n {1} -y".format(resourcegroup, vm_name)
+        result.append({ 'create_resourcegroup': "az group create -n {0} -l eastus".format(resourcegroup) })
+        result.append({ 'create_vnet': "az network vnet create -g {0} -n {1}".format(resourcegroup, vm_name) })
+        result.append({ 'create_subnet': "az network vnet subnet create -g {0} -n {1}".format(resourcegroup, vm_name) })
+        result.append({ 'create_vm': "az vm create -g {0} -n {1} -size Standard_DS1_v2 --vnet-name {2} --image UbuntuLTS".format(resourcegroup, vm_name, vm_name) })
+        result.append({ 'update_vm': "az vm update -g {0} -n {1} --set tags.testTag=xxxx".format(resourcegroup, vm_name) })
+        result.append({ 'delete_vm': "az vm delete -g {0} -n {1} -y".format(resourcegroup, vm_name) })
 
-        return results
+        return result
 
 
 def main():
