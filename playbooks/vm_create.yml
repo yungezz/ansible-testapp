@@ -31,13 +31,13 @@
     azure_rm_securitygroup:
       resource_group: "{{ resource_group }}"
       name: "{{ vm_name }}"
-      rules:
-        - name: SSH
-          protocol: Tcp
-          destination_port_range: 22
-          access: Allow
-          priority: 1001
-          direction: Inbound
+      # rules:
+      #   - name: SSH
+      #     protocol: Tcp
+      #     destination_port_range: 22
+      #     access: Allow
+      #     priority: 1001
+      #     direction: Inbound
   - name: Create virtual network inteface card
     azure_rm_networkinterface:
       resource_group: "{{ resource_group }}"
@@ -74,4 +74,9 @@
     azure_rm_virtualmachine:
       resource_group: "{{ resource_group }}"
       name: "{{ vm_name }}"
+      state: absent
+
+  - name: delete resource group
+    azure_rm_resourcegroup:
+      name: "{{ resource_group }}"
       state: absent
