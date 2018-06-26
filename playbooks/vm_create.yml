@@ -3,8 +3,8 @@
   hosts: localhost
   connection: local
   vars:
-    resource_group: ansibleperf
-    vm_name: testvm
+    # resource_group: ansibleperf
+    # vm_name: testvm
     location: eastus
   tasks:
   - name: Create a resource group

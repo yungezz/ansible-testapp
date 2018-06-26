@@ -16,15 +16,9 @@ class PerfRunner(object):
         self._args = self._parse_cli_args()
 
         # get commands
-        commands = self._get_azcli_commands(self._args.resource_group, 'UbuntuLTS', 'Standard_DS1_v2')
+        azcli_commands = self._get_azcli_commands(self._args.resource_group, 'UbuntuLTS', 'Standard_DS1_v2')
+        ansible_commands = self._get_ansible_commands(self._args.resource_group, "UbuntuLTS", 'Standard_DS1_v2')
 
-        # # prepare resource group, sub-resources,
-        # # for vm, vnet with one subnet
-        # print('preparation work.')
-        # if 'vm' in self._args['resources'] or self._args['resources'] == 'all':
-        #     print('create vnet.')
-        #     call("az network vnet  create -g {0} -n ansiblevnet --adress-prefix 10.0.0.0/16 --subnet-name ansiblesubnet --subnet-prefix 10.0.0.24".format(self._args['resource_group']))
-        #     call("az network vnet  create -g {0} -n azclivnet --adress-prefix 10.0.0.0/16 --subnet-name azclisubnet --subnet-prefix 10.0.0.24".format(self._args['resource_group']))
 
         # results
         results = dict()
@@ -33,14 +27,14 @@ class PerfRunner(object):
         index = 0
         while index < self._args.count:
             index = index + 1
-            for item in commands:
+            for item in azcli_commands:
                 for command in item:
-                    print('start to run test ' + command)
+                    print('start to run ' + command)
                     # measure time start
                     start = time.time()
 
-                    # run command
-                    return_code = subprocess.check_call(item[command], shell=True)
+                    # run az cli command
+                    return_code = subprocess.check_call(item[command], stdout=subprocess.PIPE, shell=True)
 
                     # measure time end
                     end = time.time()
@@ -49,6 +43,14 @@ class PerfRunner(object):
                     results[command] = latency
                     print(command + "======================================")
                     print(latency)
+            
+            for it in ansible_commands:
+                for cmd in it:
+                    print('start to run ansible commands: ')
+                    
+                    return_code = subprocess.check_call(it[cmd], stdout=subprocess.PIPE, shell=True)
+
+                    print("ansible command done!================================")
         
         print('test done!')
 
@@ -56,10 +58,6 @@ class PerfRunner(object):
         parser = argparse.ArgumentParser(
                     description='Produce an Ansible Inventory file for an Azure subscription')
 
-        # parser.add_argument('--tool', action='store', default='all',
-        #                     help='tools to be tested: (all, azcli, ansible)')
-        # parser.add_argument('--resources', action='store', default='all',
-        #                     help='resources to be tested: (vm, storageaccount)')
         parser.add_argument('--count', action='store', default=2,
                             help='test repeat times')
         parser.add_argument('--resource_group', action='store', default='ansibleperftest',
@@ -83,6 +81,15 @@ class PerfRunner(object):
 
         return result
 
+    def _get_ansible_commands(self, resourcegroup, image, size):
+        result = []
+        seed = ''.join(random.choice(string.ascii_lowercase) for i in range(5))
+
+        vm_name = 'vm' + seed
+        playbook = "./playbooks/vm_create.yml"
+        logfile = "./ansible.output"
+
+        result.append({ 'ansiblevm': "ansible-playbook {0} --extra-vars resource_group={1} vm_name={2} >>  {3}".format(playbook, resourcegroup, vm_name, logfile) })
 
 def main():
     PerfRunner()
