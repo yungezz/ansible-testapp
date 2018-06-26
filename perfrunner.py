@@ -5,7 +5,7 @@ import copy
 import random
 import string
 import time
-from subprocess import call
+import subprocess
 
 from os.path import expanduser
 
@@ -40,14 +40,15 @@ class PerfRunner(object):
                     start = time.time()
 
                     # run command
-                    return_code = subprocess.check_all(item[command], shell=True)
+                    return_code = subprocess.check_call(item[command], shell=True)
 
                     # measure time end
                     end = time.time()
                     latency = end - start
 
                     results[command] = latency
-                    print(command + "======================================" + latency)
+                    print(command + "======================================")
+                    print(latency)
         
         print('test done!')
 
@@ -74,9 +75,9 @@ class PerfRunner(object):
         vm_name = 'vm' + seed
 
         result.append({ 'create_resourcegroup': "az group create -n {0} -l eastus".format(resourcegroup) })
-        result.append({ 'create_vnet': "az network vnet create -g {0} -n {1}".format(resourcegroup, vm_name) })
-        result.append({ 'create_subnet': "az network vnet subnet create -g {0} -n {1}".format(resourcegroup, vm_name) })
-        result.append({ 'create_vm': "az vm create -g {0} -n {1} -size Standard_DS1_v2 --vnet-name {2} --image UbuntuLTS".format(resourcegroup, vm_name, vm_name) })
+        result.append({ 'create_vnet': "az network vnet create -g {0} -n {1} --address-prefix 10.0.0.0/16".format(resourcegroup, vm_name) })
+        result.append({ 'create_subnet': "az network vnet subnet create -g {0} -n {1} --vnet-name {2} --address-prefix 10.0.0.0/24".format(resourcegroup, vm_name, vm_name) })
+        result.append({ 'create_vm': "az vm create -g {0} -n {1} --size Standard_DS1_v2 --vnet-name {2} --image UbuntuLTS".format(resourcegroup, vm_name, vm_name) })
         result.append({ 'update_vm': "az vm update -g {0} -n {1} --set tags.testTag=xxxx".format(resourcegroup, vm_name) })
         result.append({ 'delete_vm': "az vm delete -g {0} -n {1} -y".format(resourcegroup, vm_name) })
 
