@@ -68,7 +68,7 @@ class PerfRunner(object):
                             help='test repeat times')
         parser.add_argument('--resource_group', action='store', default='ansibleperftest',
                             help='resource group name')
-        parser.add_argument('--output', action='store', default='./azcli_output.txt',
+        parser.add_argument('--output', action='store', default='./perfresult/azcli_output.csv',
                             help='output file name')
         return parser.parse_args()
 
@@ -101,7 +101,7 @@ class PerfRunner(object):
 
         vm_name = 'vm' + seed
         playbook = "./playbooks/vm_create.yml"
-        logfile = "./ansible_" + seed + ".output"
+        logfile = "./perfresult/ansible_" + seed + ".output"
 
         result.append({ 'ansiblevm': "ansible-playbook {0} --extra-vars \"resource_group={1} vm_name={2}\" >>  {3}".format(playbook, resourcegroup, vm_name, logfile) })
 
