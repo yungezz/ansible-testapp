@@ -1,0 +1,19 @@
+- hosts: localhost
+  connection: local
+  vars:
+    resource_group: ansiblewebapp1
+    location: eastus   
+    vault_name: testvaultaaaaaa 
+
+  tasks:
+  - name: set  fact
+    set_fact:
+      testvar: >
+          AZURE_KV:https://kvtesttest.vault.azure.net/:ansiblesecrets
+  - name: create a windows plan
+    debug:
+      var: testvar
+  - name: copy
+    copy:
+      content="AZURE_KV:https://kvtesttest.vault.azure.net/:ansiblesecrets"
+      dest=~/src/ansible-testapp/kvtest.txt
