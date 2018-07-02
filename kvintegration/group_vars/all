@@ -1,0 +1,2 @@
+global1: $AZURE_KV:https://kvtesttest.vault.azure.net/:ansiblesecrets
+global2: ddddd

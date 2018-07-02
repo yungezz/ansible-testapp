@@ -1,0 +1,3 @@
+---
+include1: "$AZURE_KV:https://kvtesttest.vault.azure.net/:ansiblesecrets"
+include2: aaaaaa
