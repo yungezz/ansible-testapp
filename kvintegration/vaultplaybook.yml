@@ -1,0 +1,15 @@
+---
+- name: Create Azure VM
+  hosts: localhost
+  connection: local
+  vars:
+    resource_group: demo-451
+    vm_name: testvm
+    location: eastus
+
+  tasks:
+  - include_vars: vaultfile.yml
+  - name: copy
+    copy:
+      content="{{ mysecret }}"
+      dest=./tmp.txt

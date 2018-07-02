@@ -4,16 +4,23 @@
     resource_group: ansiblewebapp1
     location: eastus   
     vault_name: testvaultaaaaaa 
+  include_vars: setupvars.yml
 
   tasks:
   - name: set  fact
     set_fact:
       testvar: >
-          AZURE_KV:https://kvtesttest.vault.azure.net/:ansiblesecrets
+          !AZURE_KV:https://kvtesttest.vault.azure.net/:ansiblesecrets
   - name: create a windows plan
     debug:
       var: testvar
+  - name: show vars fro include_vars file
+    debug: 
+      var: include1
+  - name: show global  vars
+    debug:
+      var: globalvar1
   - name: copy
     copy:
-      content="AZURE_KV:https://kvtesttest.vault.azure.net/:ansiblesecrets"
+      content="!AZURE_KV:https://kvtesttest.vault.azure.net/:ansiblesecrets"
       dest=~/src/ansible-testapp/kvtest.txt
