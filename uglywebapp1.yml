@@ -1,0 +1,86 @@
+- hosts: localhost
+  connection: local
+  vars:
+    resource_group: ansiblewebapp1
+    win_app_name: ansiblewindows
+    linux_app_name: ansiblelinux
+    vm_name: testvmss
+    location: eastus
+    plan_resource_group: ansiblewebapp1_plan
+    win_plan_name:  win_appplan1
+    linux_plan_name: linux_appplan1
+    linux_plan_resource_group: appserviceplan_test
+  
+  roles:
+    - azure_preview_modules
+
+  tasks:
+  # - name: Create a resource group
+  #   azure_rm_resourcegroup:
+  #       name: "{{ resource_group }}"
+  #       location: "{{ location }}"
+
+  - name: Create a resource group
+    azure_rm_resourcegroup:
+        name: "{{ plan_resource_group }}"
+        location: "{{ location }}"
+
+  - name: Create a resource group
+    azure_rm_resourcegroup:
+        name: "{{ linux_plan_resource_group }}"
+        location: "{{ location }}"
+
+  - name: 1 - create a win web app with java run time specific
+    azure_rm_webapp:
+        resource_group: "{{ resource_group }}"
+        name: "{{ win_app_name}}3"
+        frameworks:
+          - name: "java"
+            version: "1.8"
+            settings:
+              - name: "java_container"
+                value: "Tomcat"
+              - name: "java_container_version"
+                value: "8.0"
+        plan:
+          resource_group: "{{ plan_resource_group }}"
+          name: "{{ win_plan_name }}"
+          sku: S1
+    register: results
+
+  - name: 2 - create a linux web app with java run time specific
+    azure_rm_webapp:
+        resource_group: "{{ resource_group }}"
+        name: "{{ linux_app_name}}3"
+        frameworks:
+          - name: "java"
+            version: "1.8"
+            settings:
+              - name: "java_container"
+                value: "Tomcat"
+              - name: "java_container_version"
+                value: "8.0"
+        plan:
+          resource_group: "{{ linux_plan_resource_group }}"
+          name: "{{ linux_plan_name }}"
+          sku: S1
+    register: results
+
+  - name: 3 - create a java framework with others
+    azure_rm_webapp:
+        resource_group: "{{ resource_group }}"
+        name: "{{ linux_app_name}}4"
+        frameworks:
+          - name: "java"
+            version: "1.8"
+            settings:
+              - name: "java_container"
+                value: "Tomcat"
+              - name: "java_container_version"
+                value: "8.0"
+          - name: "node"
+            version: "6.9"
+        plan:
+          resource_group: "{{ linux_plan_resource_group }}"
+          name: "{{ linux_plan_name }}"
+    register: results
