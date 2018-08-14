@@ -57,10 +57,12 @@
     azure_rm_webapp:
         resource_group: "{{ resource_group }}"
         name: "{{ win_app_name}}3"
-        java_settings:
-          version: "1.8"
-          java_container_name: "Tomcat"
-          java_container_version: "8.0"
+        frameworks:
+          - name: "java"
+            version: "1.8"
+            settings:
+              java_container: "Tomcat"
+              java_container_version: "8.0"
         plan:
           resource_group: "{{ plan_resource_group }}"
           name: "{{ win_plan_name }}"
