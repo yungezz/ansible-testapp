@@ -1,0 +1,172 @@
+- hosts: localhost
+  connection: local
+  vars:
+    location: eastus
+    resource_group: yungez-tm1
+    profile_name: tttprofile1
+    endpointname1: tttendpoint1
+    endpointname2: tttendpoint2
+    tmname: tttprofile1
+
+  roles:
+    - azure_preview_modules
+
+  tasks:
+  - name: create  resource group
+    azure_rm_resourcegroup:
+      name: "{{ resource_group }}"
+      location: "{{ location }}"
+
+  - name: Create tm profle (check mode)
+    azure_rm_trafficmanagerprofile:
+      resource_group: "{{ resource_group }}"
+      location: global
+      profile_status: enabled
+      routing_method: performance
+      dns_config: 
+        relative_name: "{{ tmname }}"
+        ttl: 60
+      monitor_config:
+        protocol: HTTPS
+        port: 80
+        path: '/'
+      name: "{{ profile_name }}"
+    check_mode: yes
+
+  - name: Create tm profle
+    azure_rm_trafficmanagerprofile:
+      resource_group: "{{ resource_group }}"
+      location: global
+      profile_status: enabled
+      routing_method: performance
+      dns_config: 
+        relative_name: "{{ tmname }}"
+        ttl: 60
+      monitor_config:
+        protocol: HTTPS
+        port: 80
+        path: '/'
+      name: "{{ profile_name }}"
+
+  - name: get tm profle
+    azure_rm_trafficmanagerprofile_facts:
+      resource_group: "{{ resource_group }}"
+      name: "{{ profile_name }}"
+
+  - name: update tm profle
+    azure_rm_trafficmanagerprofile:
+      resource_group: "{{ resource_group }}"
+      location: global
+      profile_status: enabled
+      routing_method: priority
+      dns_config: 
+        relative_name: "{{ tmname }}"
+        ttl: 60
+      monitor_config:
+        protocol: HTTPS
+        port: 80
+        path: '/'
+      name: "{{ profile_name }}"
+#
+  - name: get tm profle
+    azure_rm_trafficmanagerprofile_facts:
+      resource_group: "{{ resource_group }}"
+      name: "{{ profile_name }}"
+
+  - name: Create Traffic Manager endpoint(check mode)
+    azure_rm_trafficmanagerendpoint:
+      resource_group: "{{ resource_group }}"
+      profile_name: "{{ tmname }}"
+      name: "{{ endpointname1 }}"
+      type: external_endpoints
+      location: westus
+      priority: 2
+      weight: 1
+      target: 1.2.3.4
+    check_mode: yes
+
+  - name: Create Traffic Manager endpoint
+    azure_rm_trafficmanagerendpoint:
+      resource_group: "{{ resource_group }}"
+      profile_name: "{{ tmname }}"
+      name: "{{ endpointname1 }}"
+      type: external_endpoints
+      location: westus
+      priority: 2
+      weight: 1
+      target: 1.2.3.4
+
+  - name: Create second Traffic Manager endpoint
+    azure_rm_trafficmanagerendpoint:
+      resource_group: "{{ resource_group }}"
+      profile_name: "{{ tmname }}"
+      name: "{{ endpointname2 }}"
+      type: external_endpoints
+      location: westus
+      priority: 1 
+      weight: 2 
+      target: 4.3.2.1
+
+  - name: Get endpoint
+    azure_rm_trafficmanagerendpoint_facts:
+      resource_group: "{{ resource_group }}"
+      profile_name: "{{ tmname }}"
+    register: output
+
+  - name: output
+    debug:
+      var: output
+#
+  - name: update Traffic Manager endpoint
+    azure_rm_trafficmanagerendpoint:
+      resource_group: "{{ resource_group }}"
+      profile_name: "{{ tmname }}"
+      name: "{{ endpointname1 }}"
+      type: external_endpoints
+      location: westus
+      priority: 2
+      weight: 1
+      target: 2.2.2.2 
+
+  - name: update endpoint no chnagex
+    azure_rm_trafficmanagerendpoint:
+      resource_group: "{{ resource_group }}"
+      profile_name: "{{ tmname }}"
+      name: "{{ endpointname1 }}"
+      type: external_endpoints
+
+  - name: get tm profle
+    azure_rm_trafficmanagerprofile_facts:
+      resource_group: "{{ resource_group }}"
+      name: "{{ profile_name }}"
+
+  - name: delete Traffic Manager endpoint
+    azure_rm_trafficmanagerendpoint:
+      resource_group: "{{ resource_group }}"
+      profile_name: "{{ tmname }}"
+      name: "{{ endpointname1 }}"
+      type: external_endpoints
+      state: absent
+
+  - name: get tm profle
+    azure_rm_trafficmanagerprofile_facts:
+      resource_group: "{{ resource_group }}"
+      name: "{{ profile_name }}"
+
+  - name: update tm profile no change
+    azure_rm_trafficmanagerprofile:
+      resource_group: "{{ resource_group }}"
+      name: "{{ profile_name }}"
+
+  - name: delete tm profle check mode
+    azure_rm_trafficmanagerprofile:
+      resource_group: "{{ resource_group }}"
+      name: "{{ profile_name }}"
+      state: absent
+    check_mode: yes
+
+  - name: delete tm profle
+    azure_rm_trafficmanagerprofile:
+      resource_group: "{{ resource_group }}"
+      name: "{{ profile_name }}"
+      state: absent

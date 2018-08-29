@@ -1,0 +1,33 @@
+- hosts: localhost
+  connection: local
+
+  vars:
+    resource_group: "jenkinstestwebapp"
+    webapp_name: "ciwebapp1"
+    location: eastus
+#  roles:
+#    - azure_preview_modules
+  tasks:
+  - name: Create a resource groupa
+    azure_rm_resourcegroup:
+      name: "{{ resource_group }}"
+      location: "{{ location }}"
+
+  - name: Create a linux web app with java framework
+    azure_rm_webapp:
+      resource_group: "{{ resource_group }}"
+      name: "{{ webapp_name }}"
+      plan:
+        resource_group: "{{ resource_group }}"
+        name: myappplan
+        is_linux: true
+        sku: S1
+      app_settings:
+        testkey: testvalue
+      frameworks:
+        - name: "java"
+          version: "1.8"
+          settings:
+            java_container: "Tomcat"
+            java_container_version: "8.0"
+

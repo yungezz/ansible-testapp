@@ -15,42 +15,60 @@
     - azure_preview_modules
 
   tasks:
-  - name: list by resource group
-    azure_rm_webapp_facts:
-      resource_group: "{{ resource_group }}"
+#  - name: list all
+#    azure_rm_webapp_facts:
+#      resource_group: "{{ resource_group }}"
 
-  - name: list by resource group and tags
-    azure_rm_webapp_facts:
-      resource_group: "{{ resource_group }}"
-      tags:
-        - tag1
+#  - name: create webapp with tag
+#    azure_rm_webapp:
+#      resource_group: "{{ resource_group }}"
+#      name: "{{ win_app_name }}tttt"
+#      plan: /subscriptions/685ba005-af8d-4b04-8f16-a7bf38b2eb5a/resourceGroups/ansiblewebapp1_plan/providers/Microsoft.Web/serverFarms/win_appplan1
+#      dns_registration: true
+#      tags:
+#        testwebappfacts111: test
+#        NewTag: newtag
 
-  - name: list by resource group and tags values
-    azure_rm_webapp_facts:
-      resource_group: "{{ resource_group }}"
-      tags:
-        tag1: "test"
+#  - name: list by resource group and tags
+#    azure_rm_webapp_facts:
+##      resource_group: "{{ resource_group }}"
+#      tags:
+#        - testwebappfacts111
+
+#  - name: list by resource group and tags values
+#    azure_rm_webapp_facts:
+#      resource_group: "{{ resource_group }}"
+#      tags:
+#        - tag1:test
 
   - name: list by name
     azure_rm_webapp_facts:
       resource_group: "{{ resource_group }}"
-      name: "{{ win_app_name }}1"
+      name: "{{ win_app_name }}7"
 
-  - name: list by name and tag
-    azure_rm_webapp_facts:
-      resource_group: "{{ resource_group }}"
-      name: "{{ win_app_name }}1"
-      tags:
-        - tag1      
+#  - name: list by name and tag
+#    azure_rm_webapp_facts:
+#      resource_group: "{{ resource_group }}"
+#      name: "{{ win_app_name }}1"
+#      tags:
+#        - tag1      
 
-  - name: list by name and tag key:value
-    azure_rm_webapp_facts:
-      resource_group: "{{ resource_group }}"
-      name: "{{ win_app_name }}1"
-      tags:
-        tag1: "test"
+#  - name: list by name and tag key:value
+#    azure_rm_webapp_facts:
+#      resource_group: "{{ resource_group }}"
+#      name: "{{ win_app_name }}1"
+#      tags:
+#        - tag1: "test"
 
-  - name: list by name and level
-    azure_rm_webapp_facts:
-      resource_group: "{{ resource_group }}"
-      name: "{{ win_app_name }}1"
+#  - name: list by name and level
+#    azure_rm_webapp_facts:
+#      resource_group: "{{ resource_group }}"
+#      name: "{{ win_app_name }}1"
+
+#  - name: list by resource group
+#    azure_rm_appserviceplan_facts:
+#      resource_group: "{{ plan_resource_group }}"
+#  - name: list by name
+#    azure_rm_appserviceplan_facts:
+#      resource_group: "{{ linux_plan_resource_group }}"
+#      name: "{{ linux_plan_name }}"
