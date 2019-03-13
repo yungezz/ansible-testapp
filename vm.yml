@@ -3,7 +3,7 @@
   hosts: localhost
   connection: local
   vars:
-    resource_group: demo-45122
+    resource_group: demo-4512
     vm_name: testvm
     location: eastus
   tasks:
